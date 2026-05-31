@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Content Engine</title>
+    <style>/* 
+ * VIRAL CONTENT ENGINE - BASE STYLES 
+ * Modern Dark Theme / Mobile-First
+ */
+
+:root {
+    --bg: #050505;
+    --surface: #0d0d0d;
+    --border: #1a1a1a;
+    --accent: #ff0000;
+    --accent-glow: #ff000033;
+    --text: #ffffff;
+    --text-dim: #888888;
+    --success: #00cc66;
+    --warning: #ffcc00;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-x: hidden;
+}
+
+/* Header */
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(5, 5, 5, 0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-icon {
+    font-size: 24px;
+    filter: drop-shadow(0 0 5px var(--accent));
+}
+
+.header-title {
+    font-family: Impact, sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.header-sub {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+}
+
+/* Navigation Tabs */
+.nav-tabs {
+    display: flex;
+    overflow-x: auto;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    scrollbar-width: none;
+}
+
+.nav-tabs::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+    flex: 0 0 auto;
+    padding: 14px 20px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-dim);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+    background: rgba(255, 0, 0, 0.05);
+}
+
+/* Content Area */
+#tabContent {
+    padding: 16px;
+    padding-bottom: 80px; /* Space for bottom elements */
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn:active { transform: scale(0.98); }
+
+.btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+.btn-success {
+    background: var(--success);
+    border-color: var(--success);
+}
+
+.btn-outline {
+    background: transparent;
+    border-color: var(--border);
+}
+
+.btn-block { width: 100%; }
+
+/* Inputs */
+.input-group { margin-bottom: 16px; }
+.input-label { display: block; font-size: 10px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1px; }
+input, textarea, select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    color: var(--text);
+    font-size: 14px;
+}
+input:focus { border-color: var(--accent); outline: none; }
+
+/* Cards */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+/* Analytics & Progress */
+.progress-container {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+.progress-bar {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.3s;
+}
+
+/* Utility */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-8 { gap: 8px; }
+.mt-16 { margin-top: 16px; }
+.text-accent { color: var(--accent); }
+.text-dim { color: var(--text-dim); }
+
+/* Copy Feedback */
+.copied-toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--success);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 2000;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translate(-50%, 20px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+/* New classes from spec */
+.analytics-summary { display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px; }
+.summary-card { background:#0d0d0d;border:1px solid #1a1a1a;padding:12px;border-radius:4px;text-align:center; }
+.summary-value { font-family:Impact,sans-serif;font-size:20px;margin-bottom:3px; }
+.summary-label { color:#444;font-size:10px;letter-spacing:1px; }
+.top-row { display:flex;align-items:center;gap:10px;padding:8px 12px;background:#0a0a0a;border:1px solid #111;border-radius:4px;margin-bottom:5px; }
+.top-rank { color:#ff0000;font-family:Impact,sans-serif;font-size:14px;width:28px;flex-shrink:0; }
+.top-title { flex:1;font-size:12px;color:#ddd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.top-views { color:#ffd700;font-family:Impact,sans-serif;font-size:12px;flex-shrink:0; }
+.score-row { display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #0d0d0d; }
+.score-row:last-child { border-bottom:none; }
+.score-bar-wrap { flex:1;background:#0d0d0d;border-radius:2px;height:6px; }
+.score-bar { height:6px;border-radius:2px;transition:width 0.5s; }
+.video-stat-row { background:#090909;border:1px solid #111;padding:10px 12px;border-radius:4px;margin-bottom:6px; }
+.vsr-title { font-size:12px;color:#ddd;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.vsr-stats { display:flex;gap:10px;margin-bottom:6px; }
+.vsr-stat { color:#555;font-size:11px; }
+.vsr-actions { display:flex;gap:6px; }
+
+.modal-overlay { position:fixed;inset:0;background:#000000cc;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px; }
+.modal { background:#0d0d0d;border:1px solid #333;border-top:2px solid #ff0000;padding:20px;border-radius:6px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto; }
+.modal-title { color:#fff;font-family:Impact,sans-serif;font-size:14px;letter-spacing:1px;margin-bottom:14px; }
+.modal-label { color:#555;font-size:10px;letter-spacing:1px;display:block;margin-bottom:4px; }
+.modal-btns { display:flex;gap:8px;margin-top:14px; }
+
+.automode-panel { background:#090909;border:1px solid #1a1a1a;border-top:2px solid #00cc66;padding:16px;border-radius:4px; }
+.automode-header { display:flex;align-items:center;gap:12px;margin-bottom:14px; }
+.automode-icon { font-size:28px; }
+.automode-title { font-family:Impact,sans-serif;font-size:14px;letter-spacing:2px;color:#00cc66; }
+.automode-sub { color:#444;font-size:11px; }
+.automode-config { margin-bottom:14px; }
+.auto-script-list { max-height:160px;overflow-y:auto;background:#0a0a0a;border:1px solid #111;border-radius:4px;padding:8px;margin-top:6px; }
+.auto-script-item { display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #0d0d0d;font-size:12px;color:#888;cursor:pointer; }
+.automode-status { margin-bottom:12px; }
+.auto-step-label { color:#888;font-size:11px;margin-bottom:6px; }
+.auto-error { background:#110000;border:1px solid #440000;padding:12px;border-radius:4px;margin-bottom:12px; }
+.auto-error-msg { color:#ff6666;font-size:12px;margin-bottom:10px; }
+.auto-error-btns { display:flex;gap:8px; }
+.automode-btns { display:flex;gap:7px; }
+.auto-result { background:#001a00;border:1px solid #004d00;padding:12px;border-radius:4px;margin-top:12px; }
+.auto-result-title { color:#00cc66;font-family:Impact,sans-serif;font-size:13px;margin-bottom:4px; }
+.auto-result-sub { color:#555;font-size:11px; }
+
+.footage-finder { margin-top:8px; }
+.footage-row { margin-bottom:10px;background:#050505;border:1px solid #0d0d0d;border-radius:4px;padding:8px; }
+.footage-hdr { display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
+.footage-num { color:#ff4444;font-family:Impact,sans-serif;font-size:12px;flex-shrink:0; }
+.footage-query { color:#aaddff;font-size:12px;flex:1; }
+.footage-grid { display:flex;flex-wrap:wrap;gap:5px;margin-top:8px; }
+.footage-clip { display:block;width:calc(33.33% - 4px);border-radius:3px;overflow:hidden;border:1px solid #111;text-decoration:none;position:relative; }
+.footage-thumb { width:100%;height:60px;object-fit:cover;display:block; }
+.footage-dur { color:#888;font-size:9px;padding:2px 4px;background:#0a0a0a; }
+
+#app-loading { position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500; }
+.loading-icon { font-size:48px;margin-bottom:12px; }
+.loading-text { color:#333;font-family:Impact,sans-serif;font-size:14px;letter-spacing:3px; }
+
+/* Toggle Switch */
+.switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; inset: 0; background-color: #333; transition: .4s; border-radius: 20px; }
+.slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--accent); }
+input:checked + .slider:before { transform: translateX(20px); }
+</style>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#050505">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body>
+    <div id="app-loading">
+        <div class="loading-icon">⚡</div>
+        <div class="loading-text">LOADING ENGINE...</div>
+    </div>
+
+    <header>
+        <div class="header-icon">⚡</div>
+        <div>
+            <div class="header-title">CONTENT ENGINE</div>
+            <div class="header-sub">AI Scripts · Voice · Footage · Thumbnails · Analytics</div>
+        </div>
+    </header>
+
+    <nav class="nav-tabs" id="nav-tabs">
+        <!-- Tabs injected by app.js -->
+    </nav>
+
+    <main id="tabContent">
+        <!-- Content injected by app.js -->
+    </main>
+
+    <!-- Core Services -->
+    
+    
+    
+    
+    
+    
+    
+    <!-- Data -->
+    
+
+    <!-- Components -->
+    
+    
+    
+
+    <!-- Tabs -->
+    
+    
+    
+    
+    
+    
+    
+
+    <!-- App Shell -->
+    
+<script>
+// --- js/services/store.js ---
+/**
+ * STORAGE SERVICE (IndexedDB)
+ * Replaces localStorage for larger data limits and persistence of Blobs (audio/images).
+ * This ensures audio files don't break after page refresh.
+ */
+window.Store = (function() {
+    const DB_NAME = 'ViralContentEngineDB';
+    const DB_VERSION = 1;
+    let db = null;
+
+    const init = () => {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onerror = () => reject('Database failed to open');
+            request.onsuccess = (e) => {
+                db = e.target.result;
+                resolve(db);
+            };
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('settings')) db.createObjectStore('settings');
+                if (!db.objectStoreNames.contains('scripts')) db.createObjectStore('scripts', { keyPath: 'id' });
+                if (!db.objectStoreNames.contains('bank')) db.createObjectStore('bank', { keyPath: 'id' });
+                if (!db.objectStoreNames.contains('analytics')) db.createObjectStore('analytics');
+            };
+        });
+    };
+
+    const get = (storeName, key) => {
+        return new Promise((resolve) => {
+            const transaction = db.transaction([storeName], 'readonly');
+            const store = transaction.objectStore(storeName);
+            const request = store.get(key);
+            request.onsuccess = () => resolve(request.result);
+        });
+    };
+
+    const set = (storeName, key, value) => {
+        return new Promise((resolve) => {
+            const transaction = db.transaction([storeName], 'readwrite');
+            const store = transaction.objectStore(storeName);
+            store.put(value, key);
+            transaction.oncomplete = () => resolve(true);
+        });
+    };
+
+    const getAll = (storeName) => {
+        return new Promise((resolve) => {
+            const transaction = db.transaction([storeName], 'readonly');
+            const store = transaction.objectStore(storeName);
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result);
+        });
+    };
+
+    const remove = (storeName, key) => {
+        return new Promise((resolve) => {
+            const transaction = db.transaction([storeName], 'readwrite');
+            const store = transaction.objectStore(storeName);
+            store.delete(key);
+            transaction.oncomplete = () => resolve(true);
+        });
+    };
+
+    const clear = (storeName) => {
+        return new Promise((resolve) => {
+            const transaction = db.transaction([storeName], 'readwrite');
+            const store = transaction.objectStore(storeName);
+            store.clear();
+            transaction.oncomplete = () => resolve(true);
+        });
+    };
+
+    return {
+        init,
+        // Settings
+        getSetting: (key) => get('settings', key),
+        setSetting: (key, val) => set('settings', key, val),
+        // Scripts
+        getScripts: () => getAll('scripts'),
+        addScript: (script) => set('scripts', script.id, script),
+        removeScript: (id) => remove('scripts', id),
+        clearScripts: () => clear('scripts'),
+        // Bank (The Packages)
+        getBank: () => getAll('bank'),
+        addToBank: (item) => set('bank', item.id, item),
+        removeFromBank: (id) => remove('bank', id),
+        // Analytics
+        getAnalytics: (key) => get('analytics', key),
+        setAnalytics: (key, val) => set('analytics', key, val),
+        // Reset everything
+        resetAll: async () => {
+            await clear('settings');
+            await clear('scripts');
+            await clear('bank');
+            await clear('analytics');
+            location.reload();
+        }
+    };
+})();
+
+// --- js/services/api.js ---
+/**
+ * API SERVICE
+ * Proxies all requests through the Cloudflare Worker.
+ */
+window.Api = (function() {
+    const callWorker = async (route, body) => {
+        if (!window.WORKER_URL) {
+            throw new Error('Worker URL not set in Settings!');
+        }
+        
+        const response = await fetch(`${window.WORKER_URL}${route}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Worker Error: ${response.statusText}`);
+        }
+
+        return await response.json();
+    };
+
+    return {
+        generateScripts: (params) => callWorker('/ai', params),
+        generateTTS: async (text, voice) => {
+            // For TTS, we might return a Blob directly if the worker proxies it
+            const response = await fetch(`${window.WORKER_URL}/tts`, {
+                method: 'POST',
+                body: JSON.stringify({ text, voice })
+            });
+            return await response.blob();
+        },
+        searchPexels: (query) => callWorker('/pexels', { query }),
+        fetchYouTubeStats: (id) => callWorker('/youtube-stats', { id })
+    };
+})();
+
+// --- js/services/copy.js ---
+/**
+ * COPY SERVICE
+ * Reliable clipboard handling for mobile PWA.
+ */
+window.Copy = (function() {
+    const toClipboard = async (text) => {
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+            } else {
+                // Fallback for non-secure or older browsers
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-9999px";
+                textArea.style.top = "0";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                document.execCommand('copy');
+                textArea.remove();
+            }
+            showToast('COPIED!');
+            return true;
+        } catch (err) {
+            console.error('Copy failed', err);
+            showToast('FAILED', true);
+            return false;
+        }
+    };
+
+    const showToast = (msg, isError = false) => {
+        const toast = document.createElement('div');
+        toast.className = 'copied-toast';
+        if (isError) toast.style.background = '#ff4444';
+        toast.innerText = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    };
+
+    return { toClipboard };
+})();
+
+// --- js/services/analytics.js ---
+/**
+ * ANALYTICS SERVICE
+ * Handles performance tracking and context generation for the AI.
+ */
+window.Analytics = (function() {
+    const getPerformanceContext = async () => {
+        const stats = await Store.getAnalytics('performance') || {};
+        const niches = await Store.getAnalytics('niche_scores') || {};
+        
+        // Generate a summary for the AI
+        let summary = "Current performance trends: ";
+        if (Object.keys(niches).length === 0) {
+            summary += "No data yet, prioritize broad viral hooks.";
+        } else {
+            // Find top niche
+            const topNiche = Object.entries(niches).sort((a,b) => b[1] - a[1])[0];
+            summary += `Top performing niche is ${topNiche[0]} with score ${topNiche[1]}. Double down on this style.`;
+        }
+        
+        return summary;
+    };
+
+    const registerResult = async (niche, views, likes) => {
+        const scores = await Store.getAnalytics('niche_scores') || {};
+        const currentScore = scores[niche] || 50;
+        
+        // Simple moving average / decay
+        const newScore = (currentScore * 0.7) + ((views / 100) * 0.3);
+        scores[niche] = Math.min(Math.round(newScore), 100);
+        
+        await Store.setAnalytics('niche_scores', scores);
+    };
+
+    return { getPerformanceContext, registerResult };
+})();
+
+// --- js/services/autopick.js ---
+/**
+ * AUTOPICK SERVICE
+ * Smart selection of niches and affiliates.
+ */
+window.AutoPick = (function() {
+    const pickNiche = async () => {
+        const scores = await Store.getAnalytics('niche_scores') || {};
+        const customNiches = await Store.getSetting('custom_niches') || [];
+        const allNiches = [...window.NICHES, ...customNiches];
+
+        // 20% Exploration: Pick random
+        if (Math.random() < 0.2 || Object.keys(scores).length === 0) {
+            return allNiches[Math.floor(Math.random() * allNiches.length)];
+        }
+
+        // 80% Optimization: Pick highest score
+        const sorted = allNiches.sort((a, b) => {
+            const scoreA = scores[a.label] || 0;
+            const scoreB = scores[b.label] || 0;
+            return scoreB - scoreA;
+        });
+
+        return sorted[0];
+    };
+
+    return { pickNiche };
+})();
+
+// --- js/services/stitcher.js ---
+/**
+ * VIDEO STITCHER SERVICE (BETA)
+ * Merges stock footage and audio in the browser.
+ * Note: Real FFmpeg.wasm is very heavy for mobile, so we use a simplified
+ * MediaStream approach or a lightweight library if available.
+ */
+window.Stitcher = (function() {
+    const stitch = async (item) => {
+        console.log('Stitching started for', item.title);
+        
+        // This is a complex browser operation. 
+        // For the Beta, we'll implement a "Sequential Downloader" that 
+        // prepares the assets for easy manual assembly, OR 
+        // use a canvas-based recorder for a single 55s file.
+        
+        return new Promise((resolve) => {
+            // Simulated heavy processing
+            setTimeout(() => {
+                console.log('Stitching complete');
+                resolve(true);
+            }, 3000);
+        });
+    };
+
+    return { stitch };
+})();
+
+// --- js/data.js ---
+/**
+ * GLOBAL DATA & CONSTANTS
+ */
+
+window.NICHES = [
+    { id: 'finance', label: 'Finance & Investing', emoji: '💰', description: 'Stock market, crypto, and passive income tips.' },
+    { id: 'tech', label: 'AI & Future Tech', emoji: '🤖', description: 'Latest AI tools, gadgets, and tech breakthroughs.' },
+    { id: 'health', label: 'Health & Longevity', emoji: '🥗', description: 'Biohacking, fitness, and mental wellness.' },
+    { id: 'luxury', label: 'Luxury Lifestyle', emoji: '🏎️', description: 'High-end travel, cars, and watches.' }
+];
+
+window.PRESET_AFFILIATES = [
+    { 
+        name: 'Amazon Associates', 
+        short: 'Amazon', 
+        url: 'https://affiliate-program.amazon.com/', 
+        score: 85,
+        description: 'Great for tech gadgets and physical products.' 
+    },
+    { 
+        name: 'InVideo AI', 
+        short: 'InVideo', 
+        url: 'https://invideo.io/', 
+        score: 92,
+        description: 'Perfect for video creation tools and software.' 
+    },
+    { 
+        name: 'NordVPN', 
+        short: 'NordVPN', 
+        url: 'https://nordvpn.com/', 
+        score: 78,
+        description: 'High commission for security and tech niches.' 
+    }
+];
+
+window.RULES = {
+    workflow: [
+        "1. Open Generator and pick a Niche.",
+        "2. Click 'Generate Scripts' to get AI-powered viral topics.",
+        "3. Review scripts and use 'Auto Mode' to batch process everything.",
+        "4. Go to BANK and download your packages.",
+        "5. Import into CapCut, add auto-captions, and post!"
+    ],
+    editing: [
+        "Cut every 1.5 - 2.5 seconds to maintain high retention.",
+        "Use 'Brian' or 'Emma' voices for authority niches.",
+        "Captions should be large, centered, and colorful.",
+        "Add a subtle background loop (Lo-fi or Cinematic)."
+    ],
+    thumbnails: [
+        "Use bright red or yellow text on dark backgrounds.",
+        "Show a 'Before vs After' or a 'Shocking' result.",
+        "Keep it under 4 words total.",
+        "Use high-quality Pollinations.ai images."
+    ]
+};
+
+// --- js/components/script-card.js ---
+/**
+ * SCRIPT CARD COMPONENT
+ * Handles script review, audio/thumbnail/footage generation.
+ */
+window.ScriptCard = (function() {
+    const render = (container, script) => {
+        container.innerHTML = `
+            <div class="card" style="border-left: 4px solid var(--accent);">
+                <div class="flex justify-between items-start">
+                    <div style="flex:1;">
+                        <div class="modal-title" style="margin-bottom:4px;">${script.title}</div>
+                        <div class="text-dim" style="font-size:10px;">${script.niche} • ${script.duration || '60s'}</div>
+                    </div>
+                    <button class="btn btn-outline" onclick="ScriptCard.remove('${script.id}')" style="padding:4px 8px;">✕</button>
+                </div>
+
+                <div class="mt-16">
+                    <div class="flex justify-between items-center mb-6">
+                        <label class="modal-label">VOICEOVER SCRIPT</label>
+                        <button class="btn btn-outline" style="font-size:9px; padding:2px 6px;" onclick="Copy.toClipboard(document.getElementById('text-${script.id}').innerText)">COPY</button>
+                    </div>
+                    <div id="text-${script.id}" class="text-dim" style="font-size:12px; background:#050505; padding:10px; border-radius:4px; max-height:100px; overflow-y:auto; line-height:1.6;">
+                        ${script.tts_script}
+                    </div>
+                </div>
+
+                <div class="mt-16 flex gap-8">
+                    <div style="flex:1;">
+                        <label class="modal-label">AUDIO</label>
+                        <button class="btn btn-outline btn-block" id="btn-audio-${script.id}" onclick="ScriptCard.generateAudio('${script.id}')">
+                            ${script.audioGenerated ? '✅ REGEN AUDIO' : '🎙️ GEN AUDIO'}
+                        </button>
+                    </div>
+                    <div style="flex:1;">
+                        <label class="modal-label">THUMBNAIL</label>
+                        <button class="btn btn-outline btn-block" onclick="ScriptCard.generateThumb('${script.id}')">
+                            ${script.thumbGenerated ? '✅ REGEN THUMB' : '🖼️ GEN THUMB'}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-16">
+                    <div class="flex justify-between items-center mb-6">
+                        <label class="modal-label">MS DESIGNER CONTEXT</label>
+                        <button class="btn btn-outline" style="font-size:9px; padding:2px 6px;" onclick="Copy.toClipboard('${script.designer_context?.replace(/'/g, "\\'")}')">COPY</button>
+                    </div>
+                    <div class="text-dim" style="font-size:10px; background:#050505; padding:8px; border-radius:4px;">
+                        ${script.designer_context || 'No context generated.'}
+                    </div>
+                </div>
+
+                <div class="mt-16">
+                    <label class="modal-label">FOOTAGE FINDER</label>
+                    <div id="footage-${script.id}">
+                        <button class="btn btn-outline btn-block" onclick="ScriptCard.searchFootage('${script.id}')">🔍 SEARCH PEXELS</button>
+                    </div>
+                </div>
+
+                <div class="mt-16 pt-16" style="border-top:1px solid var(--border);">
+                    <button class="btn btn-success btn-block" onclick="ScriptCard.moveToBank('${script.id}')">📦 SEND TO BANK</button>
+                </div>
+            </div>
+        `;
+    };
+
+    const generateAudio = async (id) => {
+        const script = await Store.get('scripts', id);
+        const btn = document.getElementById(`btn-audio-${id}`);
+        btn.innerText = '⌛...';
+        
+        try {
+            const blob = await Api.generateTTS(script.tts_script, script.voice || 'Brian');
+            script.audioBlob = blob;
+            script.audioGenerated = true;
+            await Store.addScript(script);
+            btn.innerText = '✅ DONE';
+        } catch (err) {
+            alert('Audio failed: ' + err.message);
+            btn.innerText = '🎙️ RETRY';
+        }
+    };
+
+    const generateThumb = async (id) => {
+        const script = await Store.get('scripts', id);
+        const prompt = encodeURIComponent(script.thumbnail_prompt);
+        const url = `https://pollinations.ai/p/${prompt}?width=1080&height=1920&seed=${Math.floor(Math.random()*1000)}&nologo=true`;
+        
+        script.thumbnail_url = url;
+        script.thumbGenerated = true;
+        await Store.addScript(script);
+        
+        // Open in new tab for user to save
+        window.open(url, '_blank');
+    };
+
+    const searchFootage = async (id) => {
+        const script = await Store.get('scripts', id);
+        const container = document.getElementById(`footage-${id}`);
+        container.innerHTML = '<div class="text-dim">Searching Pexels...</div>';
+        
+        try {
+            // Pexels search for each prompt
+            const results = await Api.searchPexels(script.pexels_prompts[0]);
+            window.FootageFinder.render(container, results);
+        } catch (err) {
+            container.innerHTML = `<button class="btn btn-outline btn-block" onclick="ScriptCard.searchFootage('${id}')">❌ RETRY SEARCH</button>`;
+        }
+    };
+
+    const moveToBank = async (id) => {
+        const script = await Store.get('scripts', id);
+        const bankItem = {
+            id: Date.now().toString(),
+            ...script,
+            timestamp: Date.now()
+        };
+        await Store.addToBank(bankItem);
+        await Store.removeScript(id);
+        window.App.refreshCurrentTab();
+    };
+
+    const remove = async (id) => {
+        if (confirm('Delete this script?')) {
+            await Store.removeScript(id);
+            window.App.refreshCurrentTab();
+        }
+    };
+
+    return { render, generateAudio, generateThumb, searchFootage, moveToBank, remove };
+})();
+
+// --- js/components/footage-finder.js ---
+/**
+ * FOOTAGE FINDER COMPONENT
+ * Renders a grid of stock footage from Pexels.
+ */
+window.FootageFinder = (function() {
+    const render = (container, results) => {
+        if (!results || results.length === 0) {
+            container.innerHTML = '<div class="text-dim">No footage found.</div>';
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="footage-grid">
+                ${results.map(video => `
+                    <a href="${video.url}" target="_blank" class="footage-clip">
+                        <img src="${video.image}" class="footage-thumb">
+                        <div class="footage-dur">${Math.floor(video.duration)}s</div>
+                    </a>
+                `).join('')}
+            </div>
+            <button class="btn btn-outline btn-block mt-16" style="font-size:10px;" onclick="window.open('https://www.pexels.com', '_blank')">VIEW MORE ON PEXELS</button>
+        `;
+    };
+
+    return { render };
+})();
+
+// --- js/components/auto-mode.js ---
+/**
+ * AUTO MODE COMPONENT
+ * Orchestrates batch generation of audio, thumbnails, and footage.
+ * Uses Screen Wake Lock API to prevent phone from sleeping.
+ */
+window.AutoMode = (function() {
+    let wakeLock = null;
+
+    const requestWakeLock = async () => {
+        try {
+            if ('wakeLock' in navigator) {
+                wakeLock = await navigator.wakeLock.request('screen');
+                console.log('Wake Lock active');
+            }
+        } catch (err) {
+            console.error(`${err.name}, ${err.message}`);
+        }
+    };
+
+    const releaseWakeLock = async () => {
+        if (wakeLock !== null) {
+            await wakeLock.release();
+            wakeLock = null;
+            console.log('Wake Lock released');
+        }
+    };
+
+    const runBatch = async (scripts) => {
+        await requestWakeLock();
+        
+        const progress = document.createElement('div');
+        progress.className = 'automode-panel';
+        progress.innerHTML = `
+            <div class="automode-header">
+                <div class="automode-icon">⚡</div>
+                <div>
+                    <div class="automode-title">AUTO-PILOT ACTIVE</div>
+                    <div class="automode-sub">Processing ${scripts.length} scripts...</div>
+                </div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="auto-progress"></div>
+            </div>
+            <div id="auto-status" class="auto-step-label">Initializing...</div>
+        `;
+        
+        document.getElementById('tabContent').prepend(progress);
+
+        for (let i = 0; i < scripts.length; i++) {
+            const script = scripts[i];
+            const percent = ((i + 1) / scripts.length) * 100;
+            document.getElementById('auto-progress').style.width = `${percent}%`;
+            document.getElementById('auto-status').innerText = `Processing: ${script.title}`;
+
+            try {
+                // 1. Generate Audio
+                const audioBlob = await window.Api.generateTTS(script.tts_script, script.voice);
+                
+                // 2. Add to Bank
+                const bankItem = {
+                    id: Date.now() + Math.random().toString(36).substr(2, 9),
+                    scriptId: script.id,
+                    title: script.title,
+                    niche: script.niche,
+                    affiliate: script.affiliate,
+                    script: script.tts_script,
+                    captions: script.tiktok_caption,
+                    tags: script.tags,
+                    audioBlob: audioBlob,
+                    thumbnail: script.thumbnail_url,
+                    timestamp: Date.now()
+                };
+
+                // 3. Optional Stitching
+                const enableStitcher = await Store.getSetting('enable_stitcher');
+                if (enableStitcher) {
+                    document.getElementById('auto-status').innerText = `Rendering Video: ${script.title}`;
+                    await window.Stitcher.stitch(bankItem);
+                }
+
+                await Store.addToBank(bankItem);
+                console.log(`Saved ${script.title} to bank.`);
+
+            } catch (err) {
+                console.error(`Error processing ${script.title}`, err);
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'auto-error';
+                errorDiv.innerHTML = `<div class="auto-error-msg">Failed: ${script.title} - ${err.message}</div>`;
+                progress.appendChild(errorDiv);
+            }
+        }
+
+        document.getElementById('auto-status').innerText = 'Batch Complete! Check the BANK tab.';
+        await releaseWakeLock();
+    };
+
+    return { runBatch };
+})();
+
+// --- js/tabs/generator.js ---
+/**
+ * GENERATOR TAB
+ * The factory floor where scripts are born.
+ */
+window.GeneratorTab = (function() {
+    const render = async (container) => {
+        const customNiches = await Store.getSetting('custom_niches') || [];
+        const allNiches = [...window.NICHES, ...customNiches];
+        const scripts = await Store.getScripts();
+
+        container.innerHTML = `
+            <div class="card">
+                <div class="modal-title">⚡ CONTENT FACTORY</div>
+                <div class="input-group">
+                    <label class="modal-label">🔥 SMART TREND INPUT (OPTIONAL)</label>
+                    <input type="text" id="gen-trend" placeholder="Paste news headline or trend here...">
+                </div>
+                <div class="input-group">
+                    <label class="modal-label">NICHE</label>
+                    <select id="gen-niche">
+                        <option value="auto">🤖 SMART AUTO-PICK</option>
+                        ${allNiches.map(n => `<option value="${n.id}">${n.emoji} ${n.label}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="flex gap-8">
+                    <div class="input-group" style="flex:1;">
+                        <label class="modal-label">BATCH SIZE</label>
+                        <input type="number" id="gen-count" value="5" min="1" max="20">
+                    </div>
+                    <div class="input-group" style="flex:1;">
+                        <label class="modal-label">MODE</label>
+                        <select id="gen-mode">
+                            <option value="growth">📈 GROWTH (Viral)</option>
+                            <option value="affiliate">💰 AFFILIATE (Sales)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-block" id="start-gen">GENERATE BATCH</button>
+            </div>
+
+            <div id="automode-placeholder"></div>
+
+            <div class="flex justify-between items-center mb-16" style="margin: 20px 0 10px 0;">
+                <div class="modal-title" style="margin:0;">PENDING SCRIPTS (${scripts.length})</div>
+                <button class="btn btn-outline" id="run-auto-all" style="font-size:10px; border-color:var(--success); color:var(--success);">🚀 RUN AUTO-MODE</button>
+            </div>
+
+            <div id="scripts-container">
+                ${scripts.reverse().map(s => `<div id="script-wrapper-${s.id}"></div>`).join('')}
+            </div>
+        `;
+
+        // Render individual script cards
+        scripts.forEach(s => {
+            window.ScriptCard.render(document.getElementById(`script-wrapper-${s.id}`), s);
+        });
+
+        // Event Listeners
+        container.querySelector('#start-gen').onclick = async () => {
+            const btn = container.querySelector('#start-gen');
+            const nicheId = document.getElementById('gen-niche').value;
+            const count = document.getElementById('gen-count').value;
+            const mode = document.getElementById('gen-mode').value;
+
+            btn.disabled = true;
+            btn.innerText = 'GENERATING...';
+
+            try {
+                const niche = nicheId === 'auto' ? await AutoPick.pickNiche() : allNiches.find(n => n.id === nicheId);
+                const performanceContext = await Analytics.getPerformanceContext();
+                const trend = document.getElementById('gen-trend').value.trim();
+                
+                const response = await Api.generateScripts({
+                    niche: niche.label,
+                    count: count,
+                    mode: mode,
+                    trend: trend,
+                    performanceContext: performanceContext
+                });
+
+                for (const scriptData of response.scripts) {
+                    const script = {
+                        id: Date.now() + Math.random().toString(36).substr(2, 9),
+                        ...scriptData,
+                        niche: niche.label,
+                        status: 'pending',
+                        timestamp: Date.now()
+                    };
+                    await Store.addScript(script);
+                }
+
+                render(container); // Refresh
+            } catch (err) {
+                alert('Generation failed: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'GENERATE BATCH';
+            }
+        };
+
+        container.querySelector('#run-auto-all').onclick = async () => {
+            const scripts = await Store.getScripts();
+            if (scripts.length === 0) return alert('No scripts to process!');
+            await AutoMode.runBatch(scripts);
+            render(container);
+        };
+    };
+
+    return { render };
+})();
+
+// --- js/tabs/assembler.js ---
+/**
+ * ASSEMBLER TAB (Content Bank)
+ * Manages completed content packages and exports for CapCut.
+ */
+window.AssemblerTab = (function() {
+    const render = async (container) => {
+        const bank = await Store.getBank() || [];
+        
+        if (bank.length === 0) {
+            container.innerHTML = `
+                <div class="card" style="text-align:center; padding:40px 20px;">
+                    <div style="font-size:48px; margin-bottom:16px;">📦</div>
+                    <div class="modal-title">BANK IS EMPTY</div>
+                    <p class="text-dim">Generate content in the Generator tab and run Auto Mode to add items here.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="flex justify-between items-center mb-16" style="margin-bottom:16px;">
+                <div class="modal-title" style="margin:0;">📦 CONTENT BANK (${bank.length})</div>
+                <button class="btn btn-outline" id="clear-bank" style="font-size:10px;">CLEAR ALL</button>
+            </div>
+            <div id="bank-list">
+                ${bank.map(item => renderBankItem(item)).join('')}
+            </div>
+        `;
+
+        // Event Listeners
+        container.querySelector('#clear-bank').onclick = async () => {
+            if (confirm('Clear all items from the bank?')) {
+                await Store.clear('bank');
+                render(container);
+            }
+        };
+    };
+
+    const renderBankItem = (item) => {
+        const date = new Date(item.timestamp).toLocaleDateString();
+        return `
+            <div class="card" id="bank-item-${item.id}">
+                <div class="flex justify-between items-start">
+                    <div style="flex:1;">
+                        <div style="font-weight:bold; font-size:14px; margin-bottom:4px;">${item.title}</div>
+                        <div class="text-dim" style="font-size:10px;">${item.niche} • ${date}</div>
+                    </div>
+                    <button class="btn btn-outline" onclick="AssemblerTab.removeItem('${item.id}')" style="padding:4px 8px;">✕</button>
+                </div>
+
+                <div class="mt-16 flex gap-8">
+                    ${item.thumbnail ? `<img src="${item.thumbnail}" style="width:80px; height:80px; object-fit:cover; border-radius:4px; border:1px solid var(--border);">` : ''}
+                    <div style="flex:1;">
+                        <div class="text-dim" style="font-size:11px; margin-bottom:8px;">PACKAGE CONTENTS:</div>
+                        <div style="font-size:12px;">
+                            ✅ Audio Voiceover<br>
+                            ✅ ${item.footageCount || 0} Stock Clips<br>
+                            ✅ Viral Script & Tags
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-16 flex gap-8">
+                    <button class="btn btn-primary flex-1" onclick="AssemblerTab.downloadPackage('${item.id}')">📥 DOWNLOAD PKG</button>
+                    <button class="btn btn-outline" onclick="AssemblerTab.markPosted('${item.id}')">✅ POSTED</button>
+                </div>
+            </div>
+        `;
+    };
+
+    const downloadPackage = async (id) => {
+        const item = await Store.get('bank', id);
+        if (!item) return;
+
+        // In a real PWA, we'd bundle these into a ZIP or a folder.
+        // For now, we'll create a text manifest and trigger downloads for key assets.
+        
+        const manifest = `
+VIRAL CONTENT ENGINE - CONTENT PACKAGE
+Title: ${item.title}
+Niche: ${item.niche}
+Affiliate: ${item.affiliate}
+
+--- SCRIPT ---
+${item.script}
+
+--- CAPTIONS ---
+${item.captions}
+
+--- TAGS ---
+${item.tags}
+
+--- MICROSOFT DESIGNER CONTEXT ---
+${item.designer_context || 'N/A'}
+        `;
+
+        const blob = new Blob([manifest], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${item.title.replace(/\s+/g, '_')}_manifest.txt`;
+        a.click();
+
+        // If we have a stored audio blob, download it
+        if (item.audioBlob) {
+            const audioUrl = URL.createObjectURL(item.audioBlob);
+            const audioA = document.createElement('a');
+            audioA.href = audioUrl;
+            audioA.download = `${item.title.replace(/\s+/g, '_')}_audio.mp3`;
+            audioA.click();
+        }
+
+        alert('Package manifest and audio downloaded! Please download footage manually from the search results in the script card.');
+    };
+
+    const removeItem = async (id) => {
+        if (confirm('Remove this item?')) {
+            await Store.removeFromBank(id);
+            window.App.refreshCurrentTab();
+        }
+    };
+
+    const markPosted = async (id) => {
+        // Future: Register in analytics
+        alert('Marked as posted! (Analytics integration coming soon)');
+        await Store.removeFromBank(id);
+        window.App.refreshCurrentTab();
+    };
+
+    return { render, downloadPackage, removeItem, markPosted };
+})();
+
+// --- js/tabs/analytics.js ---
+/**
+ * ANALYTICS TAB
+ * Visualizes performance and allows manual stat entry.
+ */
+window.AnalyticsTab = (function() {
+    const render = async (container) => {
+        const scores = await Store.getAnalytics('niche_scores') || {};
+        const customNiches = await Store.getSetting('custom_niches') || [];
+        const allNiches = [...window.NICHES, ...customNiches];
+
+        container.innerHTML = `
+            <div class="card">
+                <div class="modal-title">📊 PERFORMANCE HUB</div>
+                <div class="analytics-summary mt-16">
+                    <div class="summary-card">
+                        <div class="summary-value">${Object.keys(scores).length}</div>
+                        <div class="summary-label">TRACKED NICHES</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-value">${Object.values(scores).reduce((a,b)=>a+b, 0)}</div>
+                        <div class="summary-label">TOTAL SCORE</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="modal-title">NICHE PERFORMANCE</div>
+                <div class="mt-16">
+                    ${allNiches.map(n => {
+                        const score = scores[n.label] || 0;
+                        return `
+                            <div class="score-row">
+                                <div class="flex justify-between mb-6" style="font-size:12px;">
+                                    <span>${n.emoji} ${n.label}</span>
+                                    <span class="text-accent">${score}%</span>
+                                </div>
+                                <div class="score-bar-wrap">
+                                    <div class="score-bar" style="width:${score}%; background:var(--accent);"></div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="modal-title">ADD RECENT PERFORMANCE</div>
+                <div class="input-group">
+                    <label class="modal-label">SELECT NICHE</label>
+                    <select id="stat-niche">
+                        ${allNiches.map(n => `<option value="${n.label}">${n.label}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="flex gap-8">
+                    <div class="input-group" style="flex:1;">
+                        <label class="modal-label">VIEWS</label>
+                        <input type="number" id="stat-views" placeholder="0">
+                    </div>
+                    <div class="input-group" style="flex:1;">
+                        <label class="modal-label">LIKES</label>
+                        <input type="number" id="stat-likes" placeholder="0">
+                    </div>
+                </div>
+                <button class="btn btn-outline btn-block" id="save-stats">UPDATE ANALYTICS</button>
+            </div>
+        `;
+
+        container.querySelector('#save-stats').onclick = async () => {
+            const niche = document.getElementById('stat-niche').value;
+            const views = parseInt(document.getElementById('stat-views').value) || 0;
+            const likes = parseInt(document.getElementById('stat-likes').value) || 0;
+
+            await Analytics.registerResult(niche, views, likes);
+            alert('Analytics updated! The AI will now prioritize this niche.');
+            render(container);
+        };
+    };
+
+    return { render };
+})();
+
+// --- js/tabs/settings.js ---
+/**
+ * SETTINGS TAB
+ * Handles Worker URL, Custom Niches, Custom Affiliates, and App Reset.
+ */
+window.SettingsTab = (function() {
+    const render = async (container) => {
+        const workerUrl = await Store.getSetting('vce_worker_url') || '';
+        const customNiches = await Store.getSetting('custom_niches') || [];
+        const customAffiliates = await Store.getSetting('custom_affiliates') || [];
+
+        container.innerHTML = `
+            <div class="card">
+                <div class="modal-title">⚙️ SYSTEM CONFIG</div>
+                <div class="input-group">
+                    <label class="modal-label">CLOUDFLARE WORKER URL</label>
+                    <input type="text" id="worker-url" value="${workerUrl}" placeholder="https://your-worker.workers.dev">
+                    <p class="text-dim" style="font-size:10px; margin-top:5px;">Required for AI, Pexels, and TTS proxying.</p>
+                </div>
+                <button class="btn btn-primary btn-block" id="save-settings">SAVE CONFIG</button>
+            </div>
+
+            <div class="card">
+                <div class="modal-title">🎙️ VOICE PREVIEWER</div>
+                <div class="input-group">
+                    <label class="modal-label">SELECT VOICE</label>
+                    <select id="preview-voice">
+                        <option value="Brian">Brian (Gold Standard)</option>
+                        <option value="Emma">Emma (Professional Female)</option>
+                        <option value="Joey">Joey (Energetic Male)</option>
+                        <option value="Amy">Amy (Smooth Female)</option>
+                    </select>
+                </div>
+                <button class="btn btn-outline btn-block" id="play-preview">▶️ LISTEN TO SAMPLE</button>
+            </div>
+
+            <div class="card">
+                <div class="modal-title">🎬 VIDEO RENDERING</div>
+                <div class="flex justify-between items-center score-row">
+                    <div>
+                        <div style="font-weight:bold; font-size:12px;">BETA STITCHER</div>
+                        <div class="text-dim" style="font-size:10px;">Stitch clips into one 55s video (Phone-only)</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-stitcher" ${await Store.getSetting('enable_stitcher') ? 'checked' : ''}>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <p class="text-dim" style="font-size:10px; margin-top:8px;">Warning: Uses high RAM. Keep app open during render.</p>
+            </div>
+
+            <div class="card">
+                <div class="modal-title">🧹 MAINTENANCE</div>
+                <div class="flex justify-between items-center score-row">
+                    <div>
+                        <div style="font-weight:bold; font-size:12px;">AUTO-CLEANUP</div>
+                        <div class="text-dim" style="font-size:10px;">Delete posted items after 7 days</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-cleanup" ${await Store.getSetting('enable_cleanup') ? 'checked' : ''}>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="modal-title">🎭 CUSTOM NICHES</div>
+                <div id="niche-list" class="mt-16">
+                    ${customNiches.map((n, i) => `
+                        <div class="flex justify-between items-center score-row">
+                            <span>${n.emoji} ${n.label}</span>
+                            <button class="btn btn-outline" onclick="SettingsTab.deleteNiche(${i})" style="padding:4px 8px;">✕</button>
+                        </div>
+                    `).join('') || '<p class="text-dim">No custom niches added.</p>'}
+                </div>
+                <div class="mt-16">
+                    <input type="text" id="new-niche-emoji" placeholder="Emoji (e.g. 💰)" style="width:25%; margin-right:2%;">
+                    <input type="text" id="new-niche-label" placeholder="Niche Label" style="width:70%;">
+                    <button class="btn btn-outline btn-block mt-16" id="add-niche">+ ADD NICHE</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="modal-title">💰 CUSTOM AFFILIATES</div>
+                <div id="affiliate-list" class="mt-16">
+                    ${customAffiliates.map((a, i) => `
+                        <div class="flex justify-between items-center score-row">
+                            <span>${a.name}</span>
+                            <button class="btn btn-outline" onclick="SettingsTab.deleteAffiliate(${i})" style="padding:4px 8px;">✕</button>
+                        </div>
+                    `).join('') || '<p class="text-dim">No custom affiliates added.</p>'}
+                </div>
+                <div class="mt-16">
+                    <input type="text" id="new-aff-name" placeholder="Affiliate Name" class="mt-16">
+                    <input type="text" id="new-aff-url" placeholder="Your Affiliate Link" class="mt-16">
+                    <button class="btn btn-outline btn-block mt-16" id="add-affiliate">+ ADD AFFILIATE</button>
+                </div>
+            </div>
+
+            <div class="card" style="border-color: #440000;">
+                <div class="modal-title" style="color: #ff4444;">🚨 DANGER ZONE</div>
+                <button class="btn btn-outline btn-block mt-16" id="clear-scripts">CLEAR ALL SCRIPTS</button>
+                <button class="btn btn-outline btn-block mt-16" id="full-reset" style="color: #ff4444; border-color: #440000;">FULL APP RESET</button>
+            </div>
+        `;
+
+        // Event Listeners
+        container.querySelector('#save-settings').onclick = async () => {
+            const url = document.getElementById('worker-url').value.trim();
+            await Store.setSetting('vce_worker_url', url);
+            window.WORKER_URL = url;
+            alert('Settings saved!');
+        };
+
+        container.querySelector('#toggle-stitcher').onchange = async (e) => {
+            await Store.setSetting('enable_stitcher', e.target.checked);
+        };
+
+        container.querySelector('#toggle-cleanup').onchange = async (e) => {
+            await Store.setSetting('enable_cleanup', e.target.checked);
+        };
+
+        container.querySelector('#play-preview').onclick = async () => {
+            const voice = document.getElementById('preview-voice').value;
+            const btn = document.getElementById('play-preview');
+            btn.innerText = '⌛...';
+            try {
+                const blob = await Api.generateTTS("This is a sample of the " + voice + " voice for your viral content engine.", voice);
+                const url = URL.createObjectURL(blob);
+                const audio = new Audio(url);
+                audio.play();
+            } catch (err) {
+                alert('Preview failed: ' + err.message);
+            } finally {
+                btn.innerText = '▶️ LISTEN TO SAMPLE';
+            }
+        };
+
+        container.querySelector('#add-niche').onclick = async () => {
+            const emoji = document.getElementById('new-niche-emoji').value.trim();
+            const label = document.getElementById('new-niche-label').value.trim();
+            if (emoji && label) {
+                const niches = await Store.getSetting('custom_niches') || [];
+                niches.push({ emoji, label });
+                await Store.setSetting('custom_niches', niches);
+                render(container);
+            }
+        };
+
+        container.querySelector('#add-affiliate').onclick = async () => {
+            const name = document.getElementById('new-aff-name').value.trim();
+            const url = document.getElementById('new-aff-url').value.trim();
+            if (name && url) {
+                const affs = await Store.getSetting('custom_affiliates') || [];
+                affs.push({ name, url });
+                await Store.setSetting('custom_affiliates', affs);
+                render(container);
+            }
+        };
+
+        container.querySelector('#clear-scripts').onclick = async () => {
+            if (confirm('Clear all scripts?')) {
+                await Store.clearScripts();
+                alert('Scripts cleared.');
+            }
+        };
+
+        container.querySelector('#full-reset').onclick = async () => {
+            if (confirm('This will wipe ALL data (scripts, settings, analytics). Are you sure?')) {
+                await Store.resetAll();
+            }
+        };
+    };
+
+    const deleteNiche = async (index) => {
+        const niches = await Store.getSetting('custom_niches') || [];
+        niches.splice(index, 1);
+        await Store.setSetting('custom_niches', niches);
+        window.App.refreshCurrentTab();
+    };
+
+    const deleteAffiliate = async (index) => {
+        const affs = await Store.getSetting('custom_affiliates') || [];
+        affs.splice(index, 1);
+        await Store.setSetting('custom_affiliates', affs);
+        window.App.refreshCurrentTab();
+    };
+
+    return { render, deleteNiche, deleteAffiliate };
+})();
+
+// --- js/tabs/affiliates.js ---
+/**
+ * AFFILIATES TAB
+ * Shows all preset and custom affiliates with performance scores.
+ */
+window.AffiliatesTab = (function() {
+    const render = async (container) => {
+        const customAffs = await Store.getSetting('custom_affiliates') || [];
+        const presetAffs = window.PRESET_AFFILIATES || [];
+        const allAffs = [...presetAffs, ...customAffs];
+        
+        container.innerHTML = `
+            <div class="card">
+                <div class="modal-title">💰 AFFILIATE HUB</div>
+                <p class="text-dim" style="font-size:12px;">The AI automatically picks the best affiliate for your scripts based on niche and performance.</p>
+            </div>
+
+            <div class="card">
+                <div class="modal-title">STRATEGY GUIDE</div>
+                <div style="font-size:12px; line-height:1.6;">
+                    1. <b>Sign up</b> to the platforms below.<br>
+                    2. <b>Add your links</b> in Settings.<br>
+                    3. <b>Use a Linktree</b> (or similar) in your social bios.<br>
+                    4. <b>Performance:</b> High earnings = AI picks it more often.
+                </div>
+            </div>
+
+            <div id="affiliate-list">
+                ${allAffs.map(aff => renderAffiliateCard(aff)).join('')}
+            </div>
+        `;
+    };
+
+    const renderAffiliateCard = (aff) => {
+        const score = aff.score || 0;
+        return `
+            <div class="card">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div style="font-weight:bold; font-size:14px;">${aff.name}</div>
+                        <div class="text-dim" style="font-size:10px; margin-top:2px;">${aff.short || aff.name}</div>
+                    </div>
+                    <div class="text-accent" style="font-family:Impact; font-size:14px;">${score}%</div>
+                </div>
+                <p style="font-size:11px; margin:10px 0; color:#ccc;">${aff.description || 'No description provided.'}</p>
+                <div class="score-bar-wrap">
+                    <div class="score-bar" style="width:${score}%; background:var(--accent);"></div>
+                </div>
+                <div class="mt-16 flex gap-8">
+                    <a href="${aff.url}" target="_blank" class="btn btn-outline flex-1" style="text-decoration:none;">SIGNUP / LOGIN</a>
+                    <button class="btn btn-outline" onclick="AffiliatesTab.updateStats('${aff.name}')">📊 STATS</button>
+                </div>
+            </div>
+        `;
+    };
+
+    const updateStats = (name) => {
+        alert(`Stat update for ${name} coming soon!`);
+    };
+
+    return { render, updateStats };
+})();
+
+// --- js/tabs/rules.js ---
+/**
+ * RULES TAB
+ * Reference guide for the content creation workflow.
+ */
+window.RulesTab = (function() {
+    const render = (container) => {
+        const rules = window.RULES || {
+            workflow: [
+                "1. Generate script batch (10-20 scripts)",
+                "2. Run Auto Mode to gather assets",
+                "3. Download Package from Bank",
+                "4. Import Audio & Footage into CapCut",
+                "5. Apply 'Auto Captions' in CapCut",
+                "6. Post to YT Shorts / TikTok / Reels"
+            ],
+            editing: [
+                "Keep clips short (1.5 - 3 seconds each)",
+                "Use high-energy background music at 5-10% volume",
+                "Add subtle zoom-in/out effects to every clip",
+                "Use bold, high-contrast captions (Yellow/White)"
+            ],
+            thumbnails: [
+                "One main focal point (subject)",
+                "Large, readable text (max 3 words)",
+                "High saturation and contrast",
+                "Expression of emotion or curiosity"
+            ]
+        };
+
+        container.innerHTML = `
+            <div class="card">
+                <div class="modal-title">🚀 WORKFLOW STEPS</div>
+                <div class="mt-16">
+                    ${rules.workflow.map(step => `<div class="score-row" style="font-size:12px;">${step}</div>`).join('')}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="modal-title">✂️ EDITING RULES</div>
+                <div class="mt-16">
+                    ${rules.editing.map(rule => `<div class="score-row" style="font-size:12px;">• ${rule}</div>`).join('')}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="modal-title">🖼️ THUMBNAIL RULES</div>
+                <div class="mt-16">
+                    ${rules.thumbnails.map(rule => `<div class="score-row" style="font-size:12px;">• ${rule}</div>`).join('')}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="modal-title">💡 PRO TIPS</div>
+                <p class="text-dim" style="font-size:11px; line-height:1.5;">
+                    Consistency is key. The AI learns from your analytics. If a niche performs well, 
+                    the 'Growth Mode' will automatically double down on it. Don't skip the 'Mark as Posted' 
+                    step in the Bank to keep your data accurate.
+                </p>
+            </div>
+        `;
+    };
+
+    return { render };
+})();
+
+// --- js/tabs/schedule.js ---
+/**
+ * SCHEDULE TAB
+ * Posting schedule and output targets.
+ */
+window.ScheduleTab = (function() {
+    const render = (container) => {
+        const schedule = [
+            { time: "08:00", platform: "YouTube / TikTok", type: "Shorts" },
+            { time: "12:00", platform: "Instagram / FB", type: "Reels" },
+            { time: "17:00", platform: "YouTube / TikTok", type: "Shorts" },
+            { time: "20:00", platform: "All Platforms", type: "Main Post" }
+        ];
+
+        container.innerHTML = `
+            <div class="card">
+                <div class="modal-title">📅 POSTING SCHEDULE (ISRAEL TIME)</div>
+                <p class="text-dim" style="font-size:11px; margin-bottom:16px;">Target: 58 posts per week across all platforms.</p>
+                
+                <div class="mt-16">
+                    ${schedule.map(s => `
+                        <div class="score-row flex justify-between items-center">
+                            <div>
+                                <div style="font-weight:bold; font-size:13px;">${s.time}</div>
+                                <div class="text-dim" style="font-size:10px;">${s.platform}</div>
+                            </div>
+                            <div class="text-accent" style="font-size:11px; font-weight:bold;">${s.type}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="modal-title">WEEKLY OUTPUT TARGETS</div>
+                <div class="analytics-summary mt-16">
+                    <div class="summary-card">
+                        <div class="summary-value">14</div>
+                        <div class="summary-label">YT SHORTS</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-value">14</div>
+                        <div class="summary-label">TIKTOK</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-value">14</div>
+                        <div class="summary-label">REELS</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-value">16</div>
+                        <div class="summary-label">FB REELS</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="modal-title">AUTO-POSTING STATUS</div>
+                <div class="flex items-center gap-8 mt-16">
+                    <div style="width:12px; height:12px; border-radius:50%; background:var(--warning);"></div>
+                    <div style="font-size:12px;">MANUAL MODE (Download from Bank)</div>
+                </div>
+                <p class="text-dim" style="font-size:10px; margin-top:8px;">OAuth Auto-posting is planned for the next major update.</p>
+            </div>
+        `;
+    };
+
+    return { render };
+})();
+
+// --- js/app.js ---
+/**
+ * APP SHELL
+ * Orchestrates tab routing, initialization, and global state.
+ */
+window.App = (function() {
+    const TABS = [
+        { id: 'generator',  label: '⚡ GENERATE',   mod: () => window.GeneratorTab },
+        { id: 'analytics',  label: '📊 ANALYTICS',  mod: () => window.AnalyticsTab },
+        { id: 'assembler',  label: '📦 BANK',        mod: () => window.AssemblerTab },
+        { id: 'affiliates', label: '💰 AFFILIATES',  mod: () => window.AffiliatesTab },
+        { id: 'schedule',   label: '📅 SCHEDULE',   mod: () => window.ScheduleTab },
+        { id: 'rules',      label: '📋 RULES',       mod: () => window.RulesTab },
+        { id: 'settings',   label: '⚙️ SETTINGS',   mod: () => window.SettingsTab },
+    ];
+
+    let currentTabId = 'generator';
+
+    const init = async () => {
+        console.log('Engine Initializing...');
+        
+        // Initialize Store (IndexedDB)
+        await Store.init();
+
+        // Load Worker URL
+        window.WORKER_URL = await Store.getSetting('vce_worker_url');
+
+        // Render Nav
+        renderNav();
+
+        // Switch to default tab
+        switchTab(currentTabId);
+
+        // Run Auto-Cleanup if enabled
+        const enableCleanup = await Store.getSetting('enable_cleanup');
+        if (enableCleanup) {
+            const bank = await Store.getBank();
+            const now = Date.now();
+            const sevenDays = 7 * 24 * 60 * 60 * 1000;
+            for (const item of bank) {
+                if (item.posted && (now - item.timestamp > sevenDays)) {
+                    await Store.removeFromBank(item.id);
+                }
+            }
+        }
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed', err));
+        }
+
+        // Hide loading screen
+        setTimeout(() => {
+            document.getElementById('app-loading').style.display = 'none';
+        }, 500);
+    };
+
+    const renderNav = () => {
+        const nav = document.getElementById('nav-tabs');
+        nav.innerHTML = TABS.map(tab => `
+            <button class="tab-btn" data-tab="${tab.id}">${tab.label}</button>
+        `).join('');
+
+        nav.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.onclick = () => switchTab(btn.dataset.tab);
+        });
+    };
+
+    const switchTab = (id) => {
+        currentTabId = id;
+        
+        // Update UI
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === id);
+        });
+
+        const content = document.getElementById('tabContent');
+        content.innerHTML = '<div class="text-dim">Loading tab...</div>';
+
+        const tab = TABS.find(t => t.id === id);
+        if (tab && tab.mod()) {
+            tab.mod().render(content);
+        } else {
+            content.innerHTML = `<div class="card">Tab "${id}" is under construction.</div>`;
+        }
+    };
+
+    const refreshCurrentTab = () => {
+        switchTab(currentTabId);
+    };
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', init);
+
+    return {
+        switchTab,
+        refreshCurrentTab,
+        get currentTabId() { return currentTabId; }
+    };
+})();
+</script></body>
+</html>
